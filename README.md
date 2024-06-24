@@ -1,5 +1,5 @@
 # InstaCart-Tableau-Analysis
-Grocery Basket Analysis
+\textbf{Grocery Basket Analysis}
 
 # Project Title: Sales Behavior Analysis Using Instacart Online Grocery Dataset
 ## Introduction
