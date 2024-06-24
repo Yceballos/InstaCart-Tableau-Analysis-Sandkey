@@ -6,37 +6,43 @@ Grocery Basket Analysis
 This Tableau project aims to analyze and identify sales behavior patterns using the Instacart Online Grocery Basket Analysis dataset. The dataset, sourced from Kaggle, contains detailed information about customer purchases, including products, order history, and department-wise segmentation. Our analysis focuses on understanding the sales trends, customer purchasing behavior, and the probability of product purchases across different departments.
 
 ### Data Source
-Dataset: Instacart Online Grocery Basket Analysis
-Source: Kaggle https://www.kaggle.com/datasets/yasserh/instacart-online-grocery-basket-analysis-dataset
-Description: This dataset contains a large number of grocery orders over time. Each order is represented by a series of products purchased, along with metadata about the order itself.
+1. Dataset: Instacart Online Grocery Basket Analysis
+2. Source: Kaggle https://www.kaggle.com/datasets/yasserh/instacart-online-grocery-basket-analysis-dataset
+3. Description: This dataset contains a large number of grocery orders over time. Each order is represented by a series of products purchased, along with metadata about the order itself.
 
 ### Objectives
-Sales Trends: Identify and visualize the trends in sales across different time periods.
-Customer Behavior: Analyze customer purchasing patterns and behaviors.
-Departmental Insights: Provide insights into the performance of various product departments.
-Purchase Probability: Calculate and visualize the probability of products being purchased again.
-Key Metrics
-Order Count: Number of orders placed.
-Product Frequency: Frequency of each product being ordered.
-Department Performance: Sales performance metrics for different departments such as dairy, beverages, snacks, etc.
-Reorder Probability: Likelihood of a product being reordered by customers.
-Visualizations
-Sales Trends Over Time: Line charts showcasing the trend of sales over various time periods.
-Customer Purchase Behavior: Heatmaps and bar charts illustrating customer purchase frequencies and patterns.
-Department-wise Performance: Pie charts and bar charts representing the sales distribution among different departments.
-Reorder Probability Analysis: Polygons and scatter plots showing the probability of product reorders.
-Data Dictionary
-Order ID: Unique identifier for each order.
-Product ID: Unique identifier for each product.
-Add to Cart Order: Sequence in which products were added to the cart.
-Reordered: Binary indicator of whether the product has been ordered previously.
-Department: Category to which the product belongs.
-Usage Instructions
-Data Preparation: Download the dataset from Kaggle and ensure it is properly formatted for Tableau.
-Tableau Workbook: Open the Tableau workbook provided with the project.
-Data Connection: Connect the downloaded dataset to the Tableau workbook.
-Visualization Customization: Customize the visualizations as per your requirements by adjusting filters, colors, and chart types.
-Insights Extraction: Use the visualizations to extract meaningful insights about sales trends and customer behaviors.
+1. Sales Trends: Identify and visualize the trends in sales across different time periods.
+2. Customer Behavior: Analyze customer purchasing patterns and behaviors.
+3. Departmental Insights: Provide insights into the performance of various product departments.
+4. Purchase Probability: Calculate and visualize the probability of products being purchased again.
+
+### Key Metrics
+1. Order Count: Number of orders placed.
+2. Product Frequency: Frequency of each product being ordered.
+3. Department Performance: Sales performance metrics for different departments such as dairy, beverages, snacks, etc.
+4. Reorder Probability: Likelihood of a product being reordered by customers.
+
+### Visualizations
+1. Sales Trends Over Time: Line charts showcasing the trend of sales over various time periods.
+2. Customer Purchase Behavior: Heatmaps and bar charts illustrating customer purchase frequencies and patterns.
+3. Department-wise Performance: Pie charts and bar charts representing the sales distribution among different departments.
+4. Reorder Probability Analysis: Polygons and scatter plots showing the probability of product reorders.
+
+### Data Dictionary
+1. Order ID: Unique identifier for each order.
+2. Product ID: Unique identifier for each product.
+3. Add to Cart Order: Sequence in which products were added to the cart.
+4. Reordered: Binary indicator of whether the product has been ordered previously.
+5. Department: Category to which the product belongs.
+
+### Usage Instructions
+1. Data Preparation: Download the dataset from Kaggle and ensure it is properly formatted for Tableau.
+![Relation diagram](https://github.com/Yceballos/InstaCart-Tableau-Analysis/assets/90511756/1d307444-2e6e-4e51-82e9-7c2c46de9ee5)
+
+3. Tableau Workbook: Open the Tableau workbook provided with the project.
+4. Data Connection: Connect the downloaded dataset to the Tableau workbook.
+5. Visualization Customization: Customize the visualizations as per your requirements by adjusting filters, colors, and chart types.
+6. Insights Extraction: Use the visualizations to extract meaningful insights about sales trends and customer behaviors.
 
 ### How to make purchase probability analysis
 I strongly recommend to check this video, he really helps me to build my dashboard: https://www.youtube.com/watch?v=mxpDaRYRRdY 
