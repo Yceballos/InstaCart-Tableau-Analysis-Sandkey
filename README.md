@@ -7,6 +7,7 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 
 ### Data Source
 **1. Dataset:** Instacart Online Grocery Basket Analysis
+
 **2. Source:** Kaggle https://www.kaggle.com/datasets/yasserh/instacart-online-grocery-basket-analysis-dataset
 **3. Description** This dataset contains a large number of grocery orders over time. Each order is represented by a series of products purchased, along with metadata about the order itself.
 
