@@ -36,9 +36,10 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 5. Department: Category to which the product belongs.
 
 ### Usage Instructions
-1. Data Preparation: Download the dataset from Kaggle and ensure it is properly formatted for Tableau.
+1. Data Preparation: Download the dataset from Kaggle, understand relation between variables and ensure it is properly formatted for Tableau.
 ![Relation diagram](https://github.com/Yceballos/InstaCart-Tableau-Analysis/assets/90511756/1d307444-2e6e-4e51-82e9-7c2c46de9ee5)
 
+If you need to load .db extensions in tablee, I recommend to read: https://community.tableau.com/s/question/0D54T00000C6O8ASAV/connect-to-a-db-file
 3. Tableau Workbook: Open the Tableau workbook provided with the project.
 4. Data Connection: Connect the downloaded dataset to the Tableau workbook.
 5. Visualization Customization: Customize the visualizations as per your requirements by adjusting filters, colors, and chart types.
@@ -51,8 +52,74 @@ For general licenses we don´t have the option to plot Sandkey graphs.
 A Sankey diagram is a type of flow diagram where the width of the arrows is proportional to the flow rate. It is particularly useful for visualizing the distribution and flow of resources or information between different stages or categories.
 
 Steps to Create a Sankey Diagram in Tableau
-Prepare the Data:
+#### Prepare the Data:
 Ensure your data is structured properly. The uploaded data contains points essential for creating a Sankey diagram. Here's a brief look at the data structure: https://docs.google.com/spreadsheets/d/1iPiNQTOiqTGBqYgluxoH9F7clcXEpmlA2wntwiWo054/edit?gid=0#gid=0
+
+Take into account that we need to create an specific script to transform data for sandkey diagram, we need colum1 -> product_previously_purchased and column2 -> product_purchased
+
+[Uploading sandkey_script.sql…](SELECT
+    op.order_id,
+    op.add_to_cart_order,
+    op.product_id,
+    p.department_id,
+    (
+        SELECT department_id
+        FROM order_products op2
+        INNER JOIN products p2 ON op2.product_id = p2.product_id
+        WHERE op2.order_id = op.order_id
+          AND op2.add_to_cart_order = op.add_to_cart_order - 1
+    ) AS prev_department_id
+FROM
+    order_products op
+    INNER JOIN products p ON op.product_id = p.product_id
+WHERE
+    op.add_to_cart_order > 1  -- Considerar solo productos que no son el primero en la orden
+    AND EXISTS (
+        SELECT 1
+        FROM order_products op2
+        INNER JOIN products p2 ON op2.product_id = p2.product_id
+        WHERE op2.order_id = op.order_id
+          AND op2.add_to_cart_order = op.add_to_cart_order - 1
+          AND p2.department_id <> p.department_id
+    );
+
+--new
+WITH product_order AS (
+    SELECT
+        op.order_id,
+        op.add_to_cart_order,
+        op.product_id,
+        p.department_id,
+        d.department AS department,
+        LAG(p.department_id, 1) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id1,
+        LAG(d.department, 1) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous1,
+        LAG(p.department_id, 2) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id2,
+        LAG(d.department, 2) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous2,
+        LAG(p.department_id, 3) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id3,
+        LAG(d.department, 3) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous3,
+        LAG(p.department_id, 4) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id4,
+        LAG(d.department, 4) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous4
+    FROM
+        order_products op
+        INNER JOIN products p ON op.product_id = p.product_id
+        INNER JOIN departments d ON p.department_id = d.department_id
+)
+SELECT
+    order_id,
+    add_to_cart_order,
+    product_id,
+    department_id,
+    department,
+    COALESCE(previous1, 'Unknown') AS previous_department1,
+    COALESCE(previous2, 'Unknown') AS previous_department2,
+    COALESCE(previous3, 'Unknown') AS previous_department3,
+    COALESCE(previous4, 'Unknown') AS previous_department4
+FROM
+    product_order
+WHERE
+    add_to_cart_order > 4  -- Considerar solo productos que no son los primeros 4 en la orden
+    AND previous4 IS NOT NULL;  -- Filtrar aquellos productos que tienen los cuatro departamentos anteriores registrados
+)
 
 #### Data Points Explanation:
 
@@ -65,7 +132,7 @@ Ensure your data is structured properly. The uploaded data contains points essen
 You need to create several calculated fields to define the curvature and flow of the Sankey diagram. For simplicity, we start by creating a few calculated fields:
 
 Sigmoid: This function helps in smoothing the curves of the flows.
-\frac{1}{1 + \exp(-t)}
+\[ \frac{1}{1 + \exp(-t)} \]
 
 
 
