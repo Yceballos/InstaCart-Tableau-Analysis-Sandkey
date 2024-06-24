@@ -59,7 +59,7 @@ Ensure your data is structured properly. The uploaded data contains points essen
 You need to create several calculated fields to define the curvature and flow of the Sankey diagram. For simplicity, we start by creating a few calculated fields:
 
 Sigmoid: This function helps in smoothing the curves of the flows.
-\[ \frac{1}{1 + \exp(-t)} \]
+\frac{1}{1 + \exp(-t)}
 
 
 
