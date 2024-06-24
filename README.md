@@ -133,6 +133,7 @@ You need to create several calculated fields to define the curvature and flow of
 
 Sigmoid: This function helps in smoothing the curves of the flows.
 \[ \frac{1}{1 + \exp(-t)} \]
+$1/(1+exp(-t))$
 
 
 
