@@ -58,7 +58,11 @@ Steps to Create a Sankey Diagram in Tableau
 #### Prepare the Data:
 Ensure your data is structured properly. The uploaded data contains points essential for creating a Sankey diagram. Here's a brief look at the data structure: https://docs.google.com/spreadsheets/d/1iPiNQTOiqTGBqYgluxoH9F7clcXEpmlA2wntwiWo054/edit?gid=0#gid=0
 
+> [!NOTE]
 Take into account that we need to create an specific script to transform data for sandkey diagram, we need colum1 -> product_previously_purchased and column2 -> product_purchased
+For my example I made query and extract CSV file
+
+https://github.com/Yceballos/InstaCart-Tableau-Analysis/blob/main/Tableau%20archives/sandkey_script.sql
 
 #### Data Points Explanation:
 
