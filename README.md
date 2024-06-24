@@ -12,6 +12,7 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 
 **3. Description** This dataset contains a large number of grocery orders over time. Each order is represented by a series of products purchased, along with metadata about the order itself.
 
+
 ### Objectives
 **1. Sales Trends:** Identify and visualize the trends in sales across different time periods.
 
@@ -20,6 +21,7 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 **3. Departmental Insights:** Provide insights into the performance of various product departments.
 
 **4. Purchase Probability:** Calculate and visualize the probability of products being purchased again.
+
 
 ### Key Metrics
 **1. Order Count:** Number of orders placed.
@@ -30,6 +32,7 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 
 **4. Reorder Probability:** Likelihood of a product being reordered by customers.
 
+
 ### Visualizations
 **1. Sales Trends Over Time:** Line charts showcasing the trend of sales over various time periods.
 
@@ -38,6 +41,7 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 **3. Department-wise Performance:** Pie charts and bar charts representing the sales distribution among different departments.
 
 **4. Reorder Probability Analysis:** Polygons and scatter plots showing the probability of product reorders.
+
 
 ### Data Dictionary
 **1. Order ID:** Unique identifier for each order.
@@ -49,6 +53,7 @@ This Tableau project aims to analyze and identify sales behavior patterns using 
 **4. Reordered:** Binary indicator of whether the product has been ordered previously.
 
 **5. Department:** Category to which the product belongs.
+
 
 ### Usage Instructions
 **1. Data Preparation:** Download the dataset from Kaggle, understand relation between variables and ensure it is properly formatted for Tableau.
@@ -64,6 +69,7 @@ If you need to load .db extensions in tablee, I recommend to read: https://commu
 **4. Visualization Customization:** Customize the visualizations as per your requirements by adjusting filters, colors, and chart types.
 
 **5. Insights Extraction:** Use the visualizations to extract meaningful insights about sales trends and customer behaviors.
+
 
 ### How to make purchase probability analysis
 I strongly recommend to check this video, he really helps me to build my dashboard: https://www.youtube.com/watch?v=mxpDaRYRRdY 
@@ -202,6 +208,7 @@ For A Values, Flow Size and B Values
 * Adjust colors and sizes using the Link and Way of the walk fields.
 * By following these steps, you can effectively create a Sankey diagram in Tableau using the provided data without needing any additional extensions. The key is to
 * properly structure your data and use calculated fields to define the flow and curvature of the diagram.
+
 
 ### Conclusion
 This Tableau project provides a comprehensive analysis of sales behavior using the Instacart dataset. By leveraging the power of visual analytics, we can uncover significant trends and patterns that can drive data-driven decisions for improving sales strategies and customer satisfaction.
