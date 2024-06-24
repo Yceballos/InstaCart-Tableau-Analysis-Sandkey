@@ -57,70 +57,6 @@ Ensure your data is structured properly. The uploaded data contains points essen
 
 Take into account that we need to create an specific script to transform data for sandkey diagram, we need colum1 -> product_previously_purchased and column2 -> product_purchased
 
-[Uploading sandkey_script.sql…](SELECT
-    op.order_id,
-    op.add_to_cart_order,
-    op.product_id,
-    p.department_id,
-    (
-        SELECT department_id
-        FROM order_products op2
-        INNER JOIN products p2 ON op2.product_id = p2.product_id
-        WHERE op2.order_id = op.order_id
-          AND op2.add_to_cart_order = op.add_to_cart_order - 1
-    ) AS prev_department_id
-FROM
-    order_products op
-    INNER JOIN products p ON op.product_id = p.product_id
-WHERE
-    op.add_to_cart_order > 1  -- Considerar solo productos que no son el primero en la orden
-    AND EXISTS (
-        SELECT 1
-        FROM order_products op2
-        INNER JOIN products p2 ON op2.product_id = p2.product_id
-        WHERE op2.order_id = op.order_id
-          AND op2.add_to_cart_order = op.add_to_cart_order - 1
-          AND p2.department_id <> p.department_id
-    );
-
---new
-WITH product_order AS (
-    SELECT
-        op.order_id,
-        op.add_to_cart_order,
-        op.product_id,
-        p.department_id,
-        d.department AS department,
-        LAG(p.department_id, 1) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id1,
-        LAG(d.department, 1) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous1,
-        LAG(p.department_id, 2) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id2,
-        LAG(d.department, 2) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous2,
-        LAG(p.department_id, 3) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id3,
-        LAG(d.department, 3) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous3,
-        LAG(p.department_id, 4) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS prev_department_id4,
-        LAG(d.department, 4) OVER (PARTITION BY op.order_id ORDER BY op.add_to_cart_order) AS previous4
-    FROM
-        order_products op
-        INNER JOIN products p ON op.product_id = p.product_id
-        INNER JOIN departments d ON p.department_id = d.department_id
-)
-SELECT
-    order_id,
-    add_to_cart_order,
-    product_id,
-    department_id,
-    department,
-    COALESCE(previous1, 'Unknown') AS previous_department1,
-    COALESCE(previous2, 'Unknown') AS previous_department2,
-    COALESCE(previous3, 'Unknown') AS previous_department3,
-    COALESCE(previous4, 'Unknown') AS previous_department4
-FROM
-    product_order
-WHERE
-    add_to_cart_order > 4  -- Considerar solo productos que no son los primeros 4 en la orden
-    AND previous4 IS NOT NULL;  -- Filtrar aquellos productos que tienen los cuatro departamentos anteriores registrados
-)
-
 #### Data Points Explanation:
 
 1. Link: Represents the connection between nodes in the Sankey diagram.
@@ -131,11 +67,91 @@ WHERE
 #### Create a Calculated Field:
 You need to create several calculated fields to define the curvature and flow of the Sankey diagram. For simplicity, we start by creating a few calculated fields:
 
-Sigmoid: This function helps in smoothing the curves of the flows.
-\[ \frac{1}{1 + \exp(-t)} \]
+1. Sigmoid: This function helps in smoothing the curves of the flows.
 $1/(1+exp(-t))$
+2. Link Position: This field helps in positioning the links in the diagram.
+$[Path] + [Sigmoid]$
+3. Flow size indicator: This field will help us indicate the size of the flow, in this case we are going to use the number of orders.
+$ COUNTD([Order Id]) $
+4. Flow size: Will indicate the flow size.
+   Note that we use TOTAL formula to determine the total (sum) of numbers
+$ [Flow Size Indicator]/TOTAL([Flow Size Indicator]) $
+
+Other calculations:
+
+Point A
+
+1. Point A bar position: This field helps in determining the starting position of the bars.
+$ RUNNING_SUM(1/(SIZE()+1))+RUNNING_SUM([Flow Size]) - [Flow Size] $
+2. Point A Index: This field assigns an index to each row, which is useful for positioning.
+$ INDEX() $
+3. Point A Position: This field normalizes the index to ensure uniform spacing. By dividing the index by the total size plus one, we ensure that the points are evenly distributed.
+$ [Point A Index]/(SIZE()+1) $
+3. Point A Position Max: This field calculates the maximum position for Point A by adding the cumulative size of the flow. Adds the cumulative size of the flow to the normalized position, determining the endpoint of the flow.
+$ [Point A Position] + RUNNING_SUM([Flow Size]) $
+3. Point A Position Min: This field calculates the minimum position for Point A by subtracting the flow size from the maximum position. Subtracts the flow size from the maximum position to find the starting point of the flow.
+$ [Point A Position Max]-[Flow Size] $
+
+Point B
+
+1. Point B bar position: This field helps in determining the starting position of the bars.
+$ RUNNING_SUM(1/(SIZE()+1))+RUNNING_SUM([Flow Size]) - [Flow Size] $
+2. Point B Index: This field assigns an index to each row, which is useful for positioning.
+$ INDEX() $
+3. Point B Position: This field normalizes the index to ensure uniform spacing. By dividing the index by the total size plus one, we ensure that the points are evenly distributed.
+$ [Point B Index]/(SIZE()+1) $
+3. Point B Position Max: This field calculates the maximum position for Point B by adding the cumulative size of the flow. Adds the cumulative size of the flow to the normalized position, determining the endpoint of the flow.
+$ [Point B Position] + RUNNING_SUM([Flow Size]) $
+3. Point B Position Min: This field calculates the minimum position for Point B by subtracting the flow size from the maximum position. Subtracts the flow size from the maximum position to find the starting point of the flow.
+$ [Point B Position Max]-[Flow Size] $
+
+Curve
+
+To create the curved paths typical in Sankey diagrams, we need to incorporate a sigmoid function for smoothness and calculate the curve between points A and B.
+
+1. Curve: This formula calculates the intermediate points along the curve from A to B using the sigmoid function to ensure smoothness.
+$ [Point A Position]+([Point B Position]-[Point A Position])*ATTR([Sigmoid]) $
+2. Curve Max: Help us calculate curve poligonic.
+$ [Point A Position Max]+([Point B Position Max]-[Point A Position Max]) * ATTR([Sigmoid]) $
+3. Curve Min: Help us calculate curve poligonic.
+$ [Point A Position Min]+([Point B Position Min]-[Point A Position Min]) * ATTR([Sigmoid]) $
+4. Curve Poligonic: Uses a CASE statement to assign either the minimum or maximum curve value based on the "Way of the walk".
+$ CASE ATTR([Way of the walk]) WHEN 'Min' THEN [Curve Min] WHEN 'Max' THEN [Curve Max] END $
+
+#### Plotting the Data:
+1. Rows and Columns: Place the calculated fields in the Rows and Columns shelves to plot the data points.
+2. Dual-Axis: Use a dual-axis to overlay the paths and links to form a smooth flow.
+3. Path Shelf: Use the Path field to ensure that Tableau connects the points in sequence.
+
+![image](https://github.com/Yceballos/InstaCart-Tableau-Analysis/assets/90511756/e22ad390-3b06-4596-bfd0-1f73040688ed)
+
+The key is to edit table calculation:
+For A Values, Flow Size and B Values
+![image](https://github.com/Yceballos/InstaCart-Tableau-Analysis/assets/90511756/f30b36c9-4b1d-4ec1-b0e3-59249b1b518f)
 
 
+#### Customize the Visualization:
+1. Color and Size: Adjust the color and size of the flows to represent different categories or volumes.
+2. Filters: Use filters to allow users to focus on specific parts of the Sankey diagram.
+
+#### Final Adjustments:
+1. Tooltips: Customize tooltips to display relevant information about each flow.
+2. Labels: Add labels to nodes and flows for better readability.
+3. Interactivity: Ensure the diagram is interactive, allowing users to explore different paths and flows.
+
+#### Example Visualization Process
+1. Initial Setup: Import your dataset into Tableau.
+2. Create the necessary calculated fields as mentioned above.
+3. Building the Diagram: Drag Link Position to Columns.
+* Drag t to Rows.
+* Create a dual-axis by right-clicking on the axis and selecting "Dual-Axis".
+* Synchronize the axes.
+
+4. Customization:
+* Use the Path on the Path shelf to connect points.
+* Adjust colors and sizes using the Link and Way of the walk fields.
+* By following these steps, you can effectively create a Sankey diagram in Tableau using the provided data without needing any additional extensions. The key is to
+* properly structure your data and use calculated fields to define the flow and curvature of the diagram.
 
 ### Conclusion
 This Tableau project provides a comprehensive analysis of sales behavior using the Instacart dataset. By leveraging the power of visual analytics, we can uncover significant trends and patterns that can drive data-driven decisions for improving sales strategies and customer satisfaction.
